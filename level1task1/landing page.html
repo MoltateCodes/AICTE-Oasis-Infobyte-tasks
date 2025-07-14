@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="landing.css">
+  <title>StrikeZone FPS</title>
+<script>
+    window.onscroll = function () {
+      const btn = document.getElementById("goTopBtn");
+      if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+        btn.style.display = "block";
+      } else {
+        btn.style.display = "none";
+      }
+    };
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  </script>
+</head>
+<body>
+<div class="mmm">
+  <header>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Features</a>
+      <a href="#">Download</a>
+      <a href="#">Community</a>
+    </nav>
+  </header>
+  <section class="hero">
+    <img src="SZ.png" alt="Description of image" width="200" height="200">
+    <h2>StrikeZone</h2>
+    <p>NOW AVAILABLE</p>
+    <h3 class="zoom-text">New player gets 100 free spins</h3>
+    <button>Download Now</button>
+  </section>
+</div>
+  <section class="features">
+    <div class="feature-box1">
+      <h3>High Resolution Graphics</h3>
+      <p>Stunning 4K visuals with ultra-smooth gameplay at 144 FPS.</p>
+    </div>
+    <div class="feature-box2">
+      <h3>Multiplayer Modes</h3>
+      <p>Ranked matches, team deathmatch, domination and many more.</p>
+    </div>
+    <div class="feature-box3">
+      <h3>Custom Weapons</h3>
+    </div>
+  </section>
+<button onclick="scrollToTop()" id="goTopBtn" title="Go to top">
+    <img src="gototop.png" alt="Go to Top">
+</button>
+<footer class="site-footer">
+  
+    <img src="SZ.png" alt="Description of image" width="200" height="200">
+        <div class="footer-content">
+            <div class="social-links">
+                <a href="https://www.facebook.com/YourFacebookPage" target="_blank">
+                    <i class="fab fa-facebook-f"></i><img src="facebookicon.jpg" alt="Facebook">
+                </a>
+                <a href="https://www.instagram.com/YourInstagramProfile" target="_blank">
+                    <i class="fab fa-instagram"></i> <img src="instagramicon.jpg" alt="Instagram">
+                </a>
+                <a href="https://twitter.com/YourTwitterHandle" target="_blank">
+                    <i class="fab fa-twitter"></i> <img src="twittericon.jpg" alt="Twitter">
+                </a>
+            </div>
+            <p>&copy; 2025 StrikeZone. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
