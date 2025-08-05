@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SneakerVerse - Your Ultimate Sneaker Destination</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons (Cart, Heart, Social Media) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light gray background */
+        }
+        /* Custom styles for focus state on search bar */
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); /* Blue glow */
+        }
+        /* Style for filter dropdowns */
+        .filter-select {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background-color: #fff;
+            font-size: 1rem;
+            color: #374151;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .filter-select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+        }
+        /* Advertisement carousel specific styles */
+        .ad-container {
+            position: relative;
+            overflow: hidden; /* Ensures content doesn't spill out */
+        }
+        /* The inner container that holds all ad slides */
+        .ad-slides-wrapper {
+            display: flex;
+            transition: transform 0.7s ease-in-out; /* Smooth slide transition */
+        }
+        /* Each individual ad slide */
+        .ad-slide {
+            flex: 0 0 100%; /* Each slide takes full width of its parent */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .ad-slide {
+                flex-direction: row;
+                text-align: left;
+                justify-content: space-between;
+            }
+        }
+
+        .ad-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 9999px; /* Full rounded */
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0.8;
+            transition: opacity 0.3s, background-color 0.3s;
+            border: none; /* Remove default button border */
+        }
+        .ad-button:hover {
+            opacity: 1;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .ad-button.prev {
+            left: 1rem;
+        }
+        .ad-button.next {
+            right: 1rem;
+        }
+
+        /* Ad pagination dots */
+        .ad-dots-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .ad-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .ad-dot.active {
+            background-color: #4f46e5; /* Active dot color */
+            transform: scale(1.3); /* Pop effect */
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4); /* Glow effect */
+        }
+
+        /* Search input container for positioning 'X' button */
+        .search-input-container {
+            position: relative;
+            flex-grow: 1; /* Allows it to take available space */
+        }
+        .clear-search-x {
+            position: absolute;
+            right: 8px; /* Adjust as needed */
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af; /* Gray color */
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 5px;
+            transition: color 0.2s;
+        }
+        .clear-search-x:hover {
+            color: #ef4444; /* Red on hover */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md p-4 sticky top-0 z-50 rounded-b-lg">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <!-- Logo/Brand Name -->
+            <a href="#" class="text-3xl font-bold text-indigo-700 mb-4 md:mb-0">SneakerVerse</a>
+
+            <!-- Navigation Links and Search Bar -->
+            <div class="flex flex-col md:flex-row items-center gap-6 text-lg w-full md:w-auto">
+                <div class="flex flex-wrap justify-center gap-6 mb-4 md:mb-0">
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">Home</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">Shop All</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">New Arrivals</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">Sale</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">Contact</a>
+                </div>
+
+                <!-- Search Bar integrated into Navbar -->
+                <div class="flex items-center w-full md:w-auto">
+                    <div class="search-input-container relative flex-grow">
+                        <input
+                            type="text"
+                            id="search-input"
+                            placeholder="Search..."
+                            class="search-input w-full p-2 pr-10 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-indigo-500 transition duration-200 text-base"
+                        >
+                        <button id="clear-search-x-button" class="clear-search-x hidden">
+                            <i class="fas fa-times"></i> <!-- 'X' icon -->
+                        </button>
+                    </div>
+                    <button
+                        id="search-button"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-r-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 text-base"
+                    >
+                        Search
+                    </button>
+                </div>
+
+                <!-- Cart and Favorites Icons -->
+                <div class="flex items-center gap-4 ml-4">
+                    <button id="favorites-button" class="text-gray-700 hover:text-red-500 transition duration-300 relative">
+                        <i class="fas fa-heart text-2xl"></i>
+                        <span id="favorites-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </button>
+                    <button id="cart-button" class="text-gray-700 hover:text-green-500 transition duration-300 relative">
+                        <i class="fas fa-shopping-cart text-2xl"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+
+        <!-- Search Results Display -->
+        <div id="search-results" class="mt-4 mb-8 text-center text-gray-600"></div>
+
+        <!-- Filters Section -->
+        <div class="mb-8 bg-white p-6 rounded-lg shadow-md flex flex-col sm:flex-row justify-around items-center gap-4">
+            <div class="w-full sm:w-auto">
+                <label for="brand-filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Brand:</label>
+                <select id="brand-filter" class="filter-select w-full">
+                    <option value="all">All Brands</option>
+                    <option value="nike">Nike</option>
+                    <option value="adidas">Adidas</option>
+                    <option value="puma">Puma</option>
+                    <option value="new balance">New Balance</option>
+                    <option value="converse">Converse</option>
+                    <option value="vans">Vans</option>
+                    <option value="reebok">Reebok</option>
+                    <option value="asics">Asics</option>
+                    <option value="brooks">Brooks</option>
+                </select>
+            </div>
+            <div class="w-full sm:w-auto">
+                <label for="price-filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Price:</label>
+                <select id="price-filter" class="filter-select w-full">
+                    <option value="all">All Prices</option>
+                    <option value="under-50">Under $50</option>
+                    <option value="50-100">$50 - $100</option>
+                    <option value="100-150">$100 - $150</option>
+                    <option value="150-200">$150 - $200</option>
+                    <option value="over-200">Over $200</option>
+                </select>
+            </div>
+            <button
+                id="clear-filters-button"
+                class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 mt-4 sm:mt-0 hidden"
+            >
+                Clear Filters
+            </button>
+        </div>
+
+        <!-- Advertisement Section -->
+        <div class="mb-8 ad-container bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg">
+            <div id="ad-slides-wrapper" class="ad-slides-wrapper">
+                <!-- Ad content will be dynamically loaded here by JavaScript -->
+            </div>
+            <button id="prev-ad-button" class="ad-button prev">&#10094;</button> <!-- Left arrow -->
+            <button id="next-ad-button" class="ad-button next">&#10095;</button> <!-- Right arrow -->
+            <div id="ad-dots-container" class="ad-dots-container absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                <!-- Ad dots will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <!-- Product Grid Section -->
+        <div class="bg-white p-8 rounded-lg shadow-md">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Featured Products</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 product-grid">
+                <!-- Product 1 -->
+                <a href="product1.html" target="_blank" class="block cursor-pointer group" data-id="1" data-brand="nike" data-base-price="150">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center h-full">
+                        <img
+                            src="https://placehold.co/300x200/FCA5A5/FFFFFF?text=Sneaker+1"
+                            alt="Nike Air Max 270"
+                            class="w-full h-48 object-cover rounded-md mb-4 transform transition-transform duration-300 group-hover:scale-105"
+                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/FCA5A5/FFFFFF?text=Image+Not+Available';"
+                        >
+                        <h3 class="text-xl font-semibold mb-2">Nike Air Max 270</h3>
+                        <p class="text-gray-600 mb-3">Comfortable and stylish for everyday wear.</p>
+                        <span class="product-price text-2xl font-bold text-indigo-600">$150.00</span>
+                        <div class="flex gap-2 mt-4">
+                            <button class="add-to-cart-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">Add to Cart</button>
+                            <button class="add-to-favorites-button bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 2 -->
+                <a href="#" target="_blank" class="block cursor-pointer group" data-id="2" data-brand="adidas" data-base-price="180">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center h-full">
+                        <img
+                            src="https://placehold.co/300x200/93C5FD/FFFFFF?text=Sneaker+2"
+                            alt="Adidas Ultraboost 22"
+                            class="w-full h-48 object-cover rounded-md mb-4 transform transition-transform duration-300 group-hover:scale-105"
+                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/93C5FD/FFFFFF?text=Image+Not+Available';"
+                        >
+                        <h3 class="text-xl font-semibold mb-2">Adidas Ultraboost 22</h3>
+                        <p class="text-gray-600 mb-3">Responsive cushioning for running and training.</p>
+                        <span class="product-price text-2xl font-bold text-indigo-600">$180.00</span>
+                        <div class="flex gap-2 mt-4">
+                            <button class="add-to-cart-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">Add to Cart</button>
+                            <button class="add-to-favorites-button bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 3 -->
+                <a href="#" target="_blank" class="block cursor-pointer group" data-id="3" data-brand="puma" data-base-price="110">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center h-full">
+                        <img
+                            src="https://placehold.co/300x200/A78BFA/FFFFFF?text=Sneaker+3"
+                            alt="Puma RS-X Reinvention"
+                            class="w-full h-48 object-cover rounded-md mb-4 transform transition-transform duration-300 group-hover:scale-105"
+                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/A78BFA/FFFFFF?text=Image+Not+Available';"
+                        >
+                        <h3 class="text-xl font-semibold mb-2">Puma RS-X Reinvention</h3>
+                        <p class="text-gray-600 mb-3">Bold design with retro-futuristic vibes.</p>
+                        <span class="product-price text-2xl font-bold text-indigo-600">$110.00</span>
+                        <div class="flex gap-2 mt-4">
+                            <button class="add-to-cart-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">Add to Cart</button>
+                            <button class="add-to-favorites-button bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 4 -->
+                <a href="#" target="_blank" class="block cursor-pointer group" data-id="4" data-brand="new balance" data-base-price="175">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center h-full">
+                        <img
+                            src="https://placehold.co/300x200/FDBA74/FFFFFF?text=Sneaker+4"
+                            alt="New Balance 990v5"
+                            class="w-full h-48 object-cover rounded-md mb-4 transform transition-transform duration-300 group-hover:scale-105"
+                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/FDBA74/FFFFFF?text=Image+Not+Available';"
+                        >
+                        <h3 class="text-xl font-semibold mb-2">New Balance 990v5</h3>
+                        <p class="text-gray-600 mb-3">Classic style with premium comfort and durability.</p>
+                        <span class="product-price text-2xl font-bold text-indigo-600">$175.00</span>
+                        <div class="flex gap-2 mt-4">
+                            <button class="add-to-cart-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">Add to Cart</button>
+                            <button class="add-to-favorites-button bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 5 -->
+                <a href="#" target="_blank" class="block cursor-pointer group" data-id="5" data-brand="converse" data-base-price="60">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center h-full">
+                        <img
+                            src="https://placehold.co/300x200/D8B4FE/FFFFFF?text=Sneaker+5"
+                            alt="Converse Chuck Taylor All Star"
+                            class="w-full h-48 object-cover rounded-md mb-4 transform transition-transform duration-300 group-hover:scale-105"
+                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/D8B4FE/FFFFFF?text=Image+Not+Available';"
+                        >
+                        <h3 class="text-xl font-semibold mb-2">Converse Chuck Taylor All Star</h3>
+                        <p class="text-gray-600 mb-3">Timeless icon for casual and versatile looks.</p>
+                        <span class="product-price text-2xl font-bold text-indigo-600">$60.00</span>
+                        <div class="flex gap-2 mt-4">
+                            <button class="add-to-cart-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">Add to Cart</button>
+                            <button class="add-to-favorites-button bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 6 -->
+                <a href="#" target="_blank" class="block cursor-pointer group" data-id="6" data-brand="vans" data-base-price="70">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center h-full">
+                        <img
+                            src="https://placehold.co/300x200/81C784/FFFFFF?text=Sneaker+6"
+                            alt="Vans Old Skool"
+                            class="w-full h-48 object-cover rounded-md mb-4 transform transition-transform duration-300 group-hover:scale-105"
+                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/81C784/FFFFFF?text=Image+Not+Available';"
+                        >
+                        <h3 class="text-xl font-semibold mb-2">Vans Old Skool</h3>
+                        <p class="text-gray-600 mb-3">Skate-inspired classic with durable construction.</p>
+                        <span class="product-price text-2xl font-bold text-indigo-600">$70.00</span>
+                        <div class="flex gap-2 mt-4">
+                            <button class="add-to-cart-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">Add to Cart</button>
+                            <button class="add-to-favorites-button bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 7 -->
+                <a href="#" target="_blank" class="block cursor-pointer group" data-id="7" data-brand="reebok" data-base-price="80">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center h-full">
+                        <img
+                            src="https://placehold.co/300x200/60A5FA/FFFFFF?text=Sneaker+7"
+                            alt="Reebok Club C 85"
+                            class="w-full h-48 object-cover rounded-md mb-4 transform transition-transform duration-300 group-hover:scale-105"
+                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/60A5FA/FFFFFF?text=Image+Not+Available';"
+                        >
+                        <h3 class="text-xl font-semibold mb-2">Reebok Club C 85</h3>
+                        <p class="text-gray-600 mb-3">Clean, minimalist design for a timeless look.</p>
+                        <span class="product-price text-2xl font-bold text-indigo-600">$80.00</span>
+                        <div class="flex gap-2 mt-4">
+                            <button class="add-to-cart-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">Add to Cart</button>
+                            <button class="add-to-favorites-button bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 8 -->
+                <a href="#" target="_blank" class="block cursor-pointer group" data-id="8" data-brand="asics" data-base-price="160">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center h-full">
+                        <img
+                            src="https://placehold.co/300x200/A5F388/FFFFFF?text=Sneaker+8"
+                            alt="Asics Gel-Kayano 28"
+                            class="w-full h-48 object-cover rounded-md mb-4 transform transition-transform duration-300 group-hover:scale-105"
+                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/A5F388/FFFFFF?text=Image+Not+Available';"
+                        >
+                        <h3 class="text-xl font-semibold mb-2">Asics Gel-Kayano 28</h3>
+                        <p class="text-gray-600 mb-3">Stability and cushioning for long-distance runs.</p>
+                        <span class="product-price text-2xl font-bold text-indigo-600">$160.00</span>
+                        <div class="flex gap-2 mt-4">
+                            <button class="add-to-cart-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">Add to Cart</button>
+                            <button class="add-to-favorites-button bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 9 -->
+                <a href="#" target="_blank" class="block cursor-pointer group" data-id="9" data-brand="brooks" data-base-price="130">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center h-full">
+                        <img
+                            src="https://placehold.co/300x200/FFD700/FFFFFF?text=Sneaker+9"
+                            alt="Brooks Ghost 14"
+                            class="w-full h-48 object-cover rounded-md mb-4 transform transition-transform duration-300 group-hover:scale-105"
+                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/FFD700/FFFFFF?text=Image+Not+Available';"
+                        >
+                        <h3 class="text-xl font-semibold mb-2">Brooks Ghost 14</h3>
+                        <p class="text-gray-600 mb-3">Smooth rides and soft cushioning for daily training.</p>
+                        <span class="product-price text-2xl font-bold text-indigo-600">$130.00</span>
+                        <div class="flex gap-2 mt-4">
+                            <button class="add-to-cart-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">Add to Cart</button>
+                            <button class="add-to-favorites-button bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12 rounded-t-lg">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
+            <!-- Social Media -->
+            <div class="text-center md:text-left">
+                <h3 class="text-xl font-bold mb-4">Follow Us</h3>
+                <div class="flex justify-center md:justify-start space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i class="fab fa-instagram text-3xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i class="fab fa-facebook-f text-3xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i class="fab fa-twitter text-3xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Country Selector -->
+            <div class="text-center md:text-left">
+                <h3 class="text-xl font-bold mb-4">Select Your Region</h3>
+                <select id="country-selector" class="filter-select bg-gray-700 text-white border-gray-600 hover:border-indigo-500">
+                    <option value="usa">United States (USD)</option>
+                    <option value="india">India (INR)</option>
+                    <option value="uk">United Kingdom (GBP)</option>
+                    <option value="canada">Canada (CAD)</option>
+                    <option value="australia">Australia (AUD)</option>
+                    <option value="germany">Germany (EUR)</option>
+                    <option value="japan">Japan (JPY)</option>
+                </select>
+            </div>
+
+            <!-- Quick Links / About Us (Example) -->
+            <div class="text-center md:text-left">
+                <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">About Us</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Privacy Policy</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="text-center text-gray-500 mt-8">
+            &copy; 2023 SneakerVerse. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // Get references to filter elements
+        const brandFilter = document.getElementById('brand-filter');
+        const priceFilter = document.getElementById('price-filter');
+        const clearFiltersButton = document.getElementById('clear-filters-button');
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const clearSearchXButton = document.getElementById('clear-search-x-button');
+        const searchResultsDiv = document.getElementById('search-results');
+        const productGrid = document.querySelector('.product-grid');
+        const products = document.querySelectorAll('.product-grid > a'); // All product link elements
+
+        // Advertisement elements
+        const adSlidesWrapper = document.getElementById('ad-slides-wrapper');
+        const prevAdButton = document.getElementById('prev-ad-button');
+        const nextAdButton = document.getElementById('next-ad-button');
+        const adDotsContainer = document.getElementById('ad-dots-container');
+
+        // Cart and Favorites elements
+        const cartCountSpan = document.getElementById('cart-count');
+        const favoritesCountSpan = document.getElementById('favorites-count');
+        const cartButton = document.getElementById('cart-button');
+        const favoritesButton = document.getElementById('favorites-button');
+
+        // Country Selector element
+        const countrySelector = document.getElementById('country-selector');
+
+        // Data for Cart and Favorites (simplified, normally would use local storage or a backend)
+        let cartItems = [];
+        let favoriteItems = [];
+
+        // Initial product data (prices are in USD - base currency)
+        const productData = [
+            { id: 1, title: 'Nike Air Max 270', description: 'Comfortable and stylish for everyday wear.', brand: 'nike', basePrice: 150 },
+            { id: 2, title: 'Adidas Ultraboost 22', description: 'Responsive cushioning for running and training.', brand: 'adidas', basePrice: 180 },
+            { id: 3, title: 'Puma RS-X Reinvention', description: 'Bold design with retro-futuristic vibes.', brand: 'puma', basePrice: 110 },
+            { id: 4, title: 'New Balance 990v5', description: 'Classic style with premium comfort and durability.', brand: 'new balance', basePrice: 175 },
+            { id: 5, title: 'Converse Chuck Taylor All Star', description: 'Timeless icon for casual and versatile looks.', brand: 'converse', basePrice: 60 },
+            { id: 6, title: 'Vans Old Skool', description: 'Skate-inspired classic with durable construction.', brand: 'vans', basePrice: 70 },
+            { id: 7, title: 'Reebok Club C 85', description: 'Clean, minimalist design for a timeless look.', brand: 'reebok', basePrice: 80 },
+            { id: 8, title: 'Asics Gel-Kayano 28', description: 'Stability and cushioning for long-distance runs.', brand: 'asics', basePrice: 160 },
+            { id: 9, title: 'Brooks Ghost 14', description: 'Smooth rides and soft cushioning for daily training.', brand: 'brooks', basePrice: 130 }
+        ];
+
+        // Exchange rates (relative to USD) and currency symbols
+        const countryCurrencyData = {
+            usa: { rate: 1.00, symbol: '$' },    // USD
+            india: { rate: 83.00, symbol: '₹' }, // INR (approx)
+            uk: { rate: 0.79, symbol: '£' },     // GBP (approx)
+            canada: { rate: 1.36, symbol: 'C$' }, // CAD (approx)
+            australia: { rate: 1.50, symbol: 'A$' }, // AUD (approx)
+            germany: { rate: 0.92, symbol: '€' }, // EUR (approx)
+            japan: { rate: 156.00, symbol: '¥' }  // JPY (approx)
+        };
+
+        // Advertisement Data
+        const advertisements = [
+            {
+                title: 'Step Up Your Game!',
+                description: 'Discover the latest collection of high-performance sneakers. Limited time offer!',
+                buttonText: 'Shop Now',
+                imageUrl: 'https://placehold.co/600x400/667EEA/FFFFFF?text=Awesome+Sneaker+Ad+1'
+            },
+            {
+                title: 'New Season, New Kicks!',
+                description: 'Explore our fresh arrivals and find your perfect pair. Don\'t miss out!',
+                buttonText: 'View Collection',
+                imageUrl: 'https://placehold.co/600x400/F06292/FFFFFF?text=New+Arrivals+Ad+2'
+            },
+            {
+                title: 'Unbeatable Deals!',
+                description: 'Grab your favorite sneakers at incredible prices. Sale ends soon!',
+                buttonText: 'Shop Sale',
+                imageUrl: 'https://placehold.co/600x400/8BC34A/FFFFFF?text=Sale+Ad+3'
+            }
+        ];
+
+        let currentAdIndex = 0;
+        let adInterval;
+        const adDisplayDuration = 5000; // 5 seconds
+
+        /**
+         * Renders all advertisement slides into the DOM.
+         */
+        function renderAdvertisements() {
+            adSlidesWrapper.innerHTML = ''; // Clear existing content
+            advertisements.forEach((ad, index) => {
+                const adSlide = document.createElement('div');
+                adSlide.classList.add('ad-slide', 'text-white', 'overflow-hidden'); // Add overflow-hidden to clip image on small screens
+                adSlide.innerHTML = `
+                    <div class="md:w-1/2 text-center md:text-left mb-6 md:mb-0">
+                        <h2 class="text-4xl font-extrabold mb-3 leading-tight">${ad.title}</h2>
+                        <p class="text-lg mb-4 opacity-90">${ad.description}</p>
+                        <button class="bg-white text-indigo-700 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition duration-300">
+                            ${ad.buttonText}
+                        </button>
+                    </div>
+                    <div class="md:w-1/2 flex justify-center">
+                        <img
+                            src="${ad.imageUrl}"
+                            alt="${ad.title}"
+                            class="rounded-lg shadow-xl max-w-full h-auto"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/CCCCCC/000000?text=Image+Error';"
+                        >
+                    </div>
+                `;
+                adSlidesWrapper.appendChild(adSlide);
+            });
+            // Set the wrapper width to accommodate all slides for horizontal scrolling
+            adSlidesWrapper.style.width = `${advertisements.length * 100}%`;
+        }
+
+        /**
+         * Updates the display of the current advertisement and its corresponding dot.
+         */
+        function updateAdDisplay() {
+            // Slide the wrapper to show the current ad
+            adSlidesWrapper.style.transform = `translateX(-${currentAdIndex * (100 / advertisements.length)}%)`;
+
+            // Update active dot
+            const dots = adDotsContainer.querySelectorAll('.ad-dot');
+            dots.forEach((dot, index) => {
+                if (index === currentAdIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        /**
+         * Creates and appends pagination dots for the advertisements.
+         */
+        function createAdDots() {
+            adDotsContainer.innerHTML = ''; // Clear existing dots
+            advertisements.forEach((_, index) => {
+                const dot = document.createElement('span');
+                dot.classList.add('ad-dot');
+                dot.addEventListener('click', () => {
+                    clearInterval(adInterval); // Stop auto-rotation on manual dot click
+                    currentAdIndex = index;
+                    updateAdDisplay();
+                    startAdRotation(); // Restart auto-rotation after manual interaction
+                });
+                adDotsContainer.appendChild(dot);
+            });
+            updateAdDisplay(); // Set initial active dot
+        }
+
+        /**
+         * Starts the automatic advertisement rotation.
+         */
+        function startAdRotation() {
+            clearInterval(adInterval); // Clear any existing interval to prevent multiple intervals running
+            adInterval = setInterval(() => {
+                currentAdIndex = (currentAdIndex + 1) % advertisements.length;
+                updateAdDisplay();
+            }, adDisplayDuration);
+        }
+
+        /**
+         * Handles manual navigation for advertisements.
+         * @param {number} direction - 1 for next, -1 for previous.
+         */
+        function navigateAdvertisement(direction) {
+            clearInterval(adInterval); // Clear the automatic interval immediately
+
+            currentAdIndex += direction;
+            if (currentAdIndex < 0) {
+                currentAdIndex = advertisements.length - 1;
+            } else if (currentAdIndex >= advertisements.length) {
+                currentAdIndex = 0;
+            }
+            updateAdDisplay();
+
+            // Restart the automatic interval after a short delay
+            // This allows the user to click multiple times without immediate auto-advance
+            setTimeout(startAdRotation, adDisplayDuration);
+        }
+
+        /**
+         * Adds a product to the cart.
+         * @param {object} product - The product object to add.
+         */
+        function addToCart(product) {
+            const existingItem = cartItems.find(item => item.id === product.id);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cartItems.push({ ...product, quantity: 1 });
+            }
+            updateCartCount();
+            console.log('Cart:', cartItems); // For demonstration, log to console
+            // In a real app, you'd show a modal or update a cart display
+        }
+
+        /**
+         * Adds a product to favorites.
+         * @param {object} product - The product object to add.
+         */
+        function addToFavorites(product) {
+            const existingFavorite = favoriteItems.find(item => item.id === product.id);
+            if (!existingFavorite) {
+                favoriteItems.push(product);
+                updateFavoritesCount();
+                console.log('Favorites:', favoriteItems); // For demonstration, log to console
+                // In a real app, you'd show a modal or update a favorites display
+            } else {
+                console.log('Product already in favorites:', product.title);
+            }
+        }
+
+        /**
+         * Updates the display of the cart item count.
+         */
+        function updateCartCount() {
+            const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountSpan.textContent = totalItems;
+        }
+
+        /**
+         * Updates the display of the favorites item count.
+         */
+        function updateFavoritesCount() {
+            favoritesCountSpan.textContent = favoriteItems.length;
+        }
+
+        /**
+         * Updates the displayed prices of all products based on the selected country.
+         */
+        function updateProductPrices() {
+            const selectedCountry = countrySelector.value;
+            const currencyData = countryCurrencyData[selectedCountry];
+            const rate = currencyData.rate;
+            const symbol = currencyData.symbol;
+
+            products.forEach(productElement => {
+                const basePrice = parseFloat(productElement.dataset.basePrice);
+                const newPrice = (basePrice * rate).toFixed(2); // Format to 2 decimal places
+
+                const priceSpan = productElement.querySelector('.product-price');
+                if (priceSpan) {
+                    priceSpan.textContent = `${symbol}${newPrice}`;
+                }
+            });
+            // After updating prices, re-apply filters to ensure correct visibility based on new price ranges
+            applyFiltersAndSearch();
+        }
+
+
+        // Event Listeners
+        brandFilter.addEventListener('change', applyFiltersAndSearch); // Auto-apply on change
+        priceFilter.addEventListener('change', applyFiltersAndSearch); // Auto-apply on change
+        countrySelector.addEventListener('change', updateProductPrices); // Auto-apply price change on country selection
+
+        clearFiltersButton.addEventListener('click', clearFilters);
+        searchButton.addEventListener('click', applyFiltersAndSearch);
+        searchInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                applyFiltersAndSearch();
+            }
+        });
+
+        // Event listener for search input to show/hide 'X' button
+        searchInput.addEventListener('input', function() {
+            if (searchInput.value.length > 0) {
+                clearSearchXButton.classList.remove('hidden');
+            } else {
+                clearSearchXButton.classList.add('hidden');
+            }
+        });
+
+        // Event listener for the new clear 'X' button
+        clearSearchXButton.addEventListener('click', function() {
+            searchInput.value = ''; // Clear the input
+            clearSearchXButton.classList.add('hidden'); // Hide the 'X' button
+            applyFiltersAndSearch(); // Re-apply filters to show all products
+        });
+
+
+        // Advertisement button event listeners
+        prevAdButton.addEventListener('click', () => navigateAdvertisement(-1));
+        nextAdButton.addEventListener('click', () => navigateAdvertisement(1));
+
+        // Add event listeners for "Add to Cart" and "Add to Favorites" buttons
+        document.addEventListener('click', function(event) {
+            // Check if the click target is an "Add to Cart" button or its icon
+            const cartButtonTarget = event.target.closest('.add-to-cart-button');
+            if (cartButtonTarget) {
+                event.preventDefault(); // Prevent the parent <a> tag from being triggered
+                const productId = cartButtonTarget.closest('[data-id]').dataset.id;
+                const product = productData.find(p => p.id == productId); // Use == for comparison as dataset.id is string
+                if (product) {
+                    addToCart(product);
+                }
+            }
+            // Check if the click target is an "Add to Favorites" button or its icon
+            const favoritesButtonTarget = event.target.closest('.add-to-favorites-button');
+            if (favoritesButtonTarget) {
+                event.preventDefault(); // Prevent the parent <a> tag from being triggered
+                const productId = favoritesButtonTarget.closest('[data-id]').dataset.id;
+                const product = productData.find(p => p.id == productId);
+                if (product) {
+                    addToFavorites(product);
+                }
+            }
+        });
+
+        // Event listeners for Cart/Favorites buttons in navbar (for future modal/page display)
+        cartButton.addEventListener('click', () => {
+            console.log('Cart button clicked. Current cart:', cartItems);
+            // Here you would typically open a cart modal or navigate to a cart page
+        });
+
+        favoritesButton.addEventListener('click', () => {
+            console.log('Favorites button clicked. Current favorites:', favoriteItems);
+            // Here you would typically open a favorites modal or navigate to a favorites page
+        });
+
+        /**
+         * Resets all filter dropdowns to 'all' and re-applies filters.
+         */
+        function clearFilters() {
+            brandFilter.value = 'all'; // Reset brand filter
+            priceFilter.value = 'all'; // Reset price filter
+            applyFiltersAndSearch(); // Re-apply filters (which will now show all if no search is active)
+        }
+
+        /**
+         * Applies selected filters and search query to the product display.
+         */
+        function applyFiltersAndSearch() {
+            const selectedBrand = brandFilter.value;
+            const selectedPriceRange = priceFilter.value;
+            const searchQuery = searchInput.value.toLowerCase();
+
+            let visibleProductCount = 0;
+
+            products.forEach((productElement, index) => {
+                const product = productData[index]; // Get the corresponding product data
+
+                let isVisible = true;
+
+                // Apply Brand Filter
+                if (selectedBrand !== 'all' && product.brand !== selectedBrand) {
+                    isVisible = false;
+                }
+
+                // Apply Price Filter
+                if (isVisible && selectedPriceRange !== 'all') {
+                    // Use the base price for filtering, then convert for display
+                    const basePrice = product.basePrice;
+                    switch (selectedPriceRange) {
+                        case 'under-50':
+                            if (basePrice >= 50) isVisible = false;
+                            break;
+                        case '50-100':
+                            if (basePrice < 50 || basePrice > 100) isVisible = false;
+                            break;
+                        case '100-150':
+                            if (basePrice < 100 || basePrice > 150) isVisible = false;
+                            break;
+                        case '150-200':
+                            if (basePrice < 150 || basePrice > 200) isVisible = false;
+                            break;
+                        case 'over-200':
+                            if (basePrice <= 200) isVisible = false;
+                            break;
+                    }
+                }
+
+                // Apply Search Query Filter
+                if (isVisible && searchQuery) {
+                    const titleMatches = product.title.toLowerCase().includes(searchQuery);
+                    const descriptionMatches = product.description.toLowerCase().includes(searchQuery);
+                    if (!titleMatches && !descriptionMatches) {
+                        isVisible = false;
+                    }
+                }
+
+                // Show or hide the product element
+                if (isVisible) {
+                    productElement.style.display = 'block'; // Use block to maintain grid layout
+                    visibleProductCount++;
+                } else {
+                    productElement.style.display = 'none';
+                }
+            });
+
+            // Update search results message
+            if (searchQuery || selectedBrand !== 'all' || selectedPriceRange !== 'all') {
+                searchResultsDiv.textContent = `Showing ${visibleProductCount} result(s).`;
+            } else {
+                searchResultsDiv.textContent = ''; // Clear message if no filters/search active
+            }
+
+            // Show/hide the product grid container based on results
+            if (visibleProductCount > 0) {
+                productGrid.style.display = 'grid';
+            } else {
+                productGrid.style.display = 'none';
+            }
+
+            // Show/hide Clear Filters button based on whether any filter is active
+            if (selectedBrand !== 'all' || selectedPriceRange !== 'all') {
+                clearFiltersButton.classList.remove('hidden');
+            } else {
+                clearFiltersButton.classList.add('hidden');
+            }
+        }
+
+        // Initial setup
+        window.onload = function() {
+            renderAdvertisements(); // Render all ad slides
+            createAdDots();      // Create pagination dots
+            startAdRotation();   // Start automatic rotation
+            // Initial display of all products and prices based on default country
+            updateProductPrices(); // Call this first to set initial prices
+            applyFiltersAndSearch(); // Then apply filters (if any are pre-selected)
+            updateCartCount();   // Initialize cart count
+            updateFavoritesCount(); // Initialize favorites count
+            // Ensure 'X' button is hidden on initial load if search input is empty
+            if (searchInput.value.length === 0) {
+                clearSearchXButton.classList.add('hidden');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nike Air Max 270 | SneakerVerse</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons (Cart, Heart, Social Media) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light gray background */
+        }
+        /* Style for selected options */
+        .selected-option {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+        }
+        .color-option.selected-option {
+            transform: scale(1.1);
+        }
+        /* Custom styles for the notification */
+        .notification-container {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+        .notification {
+            background-color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 9999px; /* Full rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            animation: fadeInOut 3s forwards;
+            opacity: 0;
+            text-align: center;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+        /* Search results dropdown styling */
+        #search-results-dropdown {
+            max-height: 300px;
+            overflow-y: auto;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background-color: #fff;
+            border-radius: 0 0 0.5rem 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            display: none;
+        }
+        .search-result-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.2s ease;
+        }
+        .search-result-item:hover {
+            background-color: #f1f5f9;
+        }
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md p-4 sticky top-0 z-50 rounded-b-lg">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <!-- Logo/Brand Name -->
+            <a href="index.html" class="text-3xl font-bold text-indigo-700 mb-4 md:mb-0">SneakerVerse</a>
+
+            <!-- Navigation Links and Search Bar -->
+            <div class="flex flex-col md:flex-row items-center flex-grow gap-6 mb-4 md:mb-0 md:mx-10">
+                <a href="index.html" class="text-gray-700 hover:text-indigo-600 transition duration-300">Home</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">Shop All</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">New Arrivals</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">Sale</a>
+                
+                <!-- Search Bar with clear and search buttons -->
+                <div class="relative w-full md:w-80 flex items-center">
+                    <input type="text" id="search-input" placeholder="Search for sneakers..." class="w-full px-4 py-2 pl-10 pr-20 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <!-- Clear button (initially hidden) -->
+                    <button id="clear-search-button" class="absolute inset-y-0 right-14 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <!-- Search button -->
+                    <button id="search-button" class="absolute inset-y-0 right-0 flex items-center px-4 rounded-r-full bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <!-- Search Results Dropdown -->
+                    <div id="search-results-dropdown"></div>
+                </div>
+            </div>
+            
+            <!-- Cart and Favorites Icons -->
+            <div class="flex items-center gap-4">
+                <button id="favorites-button" class="text-gray-700 hover:text-red-500 transition duration-300 relative">
+                    <i class="fas fa-heart text-2xl"></i>
+                    <span id="favorites-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+                <button id="cart-button" class="text-gray-700 hover:text-green-500 transition duration-300 relative">
+                    <i class="fas fa-shopping-cart text-2xl"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Product Section -->
+    <div class="container mx-auto px-4 py-12">
+        <div class="bg-white p-8 md:p-12 rounded-lg shadow-xl grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+
+            <!-- Left Column: Image Gallery -->
+            <div class="flex flex-col items-center">
+                <div class="w-full h-auto mb-4 overflow-hidden rounded-lg shadow-lg">
+                    <img id="main-product-image" src="https://placehold.co/800x600/FCA5A5/FFFFFF?text=Sneaker+Front+View" alt="Nike Air Max 270 Main View" class="w-full object-cover transition-transform duration-300 hover:scale-105">
+                </div>
+                <!-- Thumbnail Images -->
+                <div class="flex gap-4 justify-center w-full mt-4">
+                    <img src="https://placehold.co/150x110/FCA5A5/FFFFFF?text=Sneaker+Side" alt="Nike Air Max 270 Side View" class="thumbnail w-1/4 h-auto cursor-pointer rounded-lg border-2 border-indigo-600 object-cover transition-transform duration-200 hover:scale-105" data-full-img="https://placehold.co/800x600/FCA5A5/FFFFFF?text=Sneaker+Side+View">
+                    <img src="https://placehold.co/150x110/FCA5A5/FFFFFF?text=Sneaker+Back" alt="Nike Air Max 270 Back View" class="thumbnail w-1/4 h-auto cursor-pointer rounded-lg border-2 border-transparent object-cover transition-transform duration-200 hover:scale-105" data-full-img="https://placehold.co/800x600/FCA5A5/FFFFFF?text=Sneaker+Back+View">
+                    <img src="https://placehold.co/150x110/FCA5A5/FFFFFF?text=Sneaker+Sole" alt="Nike Air Max 270 Sole View" class="thumbnail w-1/4 h-auto cursor-pointer rounded-lg border-2 border-transparent object-cover transition-transform duration-200 hover:scale-105" data-full-img="https://placehold.co/800x600/FCA5A5/FFFFFF?text=Sneaker+Sole+View">
+                </div>
+            </div>
+
+            <!-- Right Column: Product Info -->
+            <div class="flex flex-col">
+                <h1 id="product-title" class="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-2">Nike Air Max 270</h1>
+                <p id="product-brand" class="text-lg text-gray-500 mb-4">By Nike</p>
+                
+                <div class="flex items-baseline gap-4 mb-6">
+                    <span id="product-price" class="text-4xl font-bold text-indigo-600">$150.00</span>
+                </div>
+                
+                <p id="product-description" class="text-lg text-gray-700 leading-relaxed mb-6">
+                    Experience the ultimate fusion of comfort and style with the Nike Air Max 270. Featuring the tallest Air unit in the Nike history, it delivers a soft, cushioned ride that feels as good as it looks. Perfect for everyday wear, this sneaker stands out with its bold, innovative design.
+                </p>
+
+                <!-- Size Selector -->
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2">Select Size</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="size-option p-3 rounded-lg border-2 border-gray-300 hover:border-indigo-500 transition duration-200" data-size="US 7">US 7</button>
+                        <button class="size-option p-3 rounded-lg border-2 border-gray-300 hover:border-indigo-500 transition duration-200" data-size="US 8">US 8</button>
+                        <button class="size-option p-3 rounded-lg border-2 border-gray-300 hover:border-indigo-500 transition duration-200" data-size="US 9">US 9</button>
+                        <button class="size-option p-3 rounded-lg border-2 border-gray-300 hover:border-indigo-500 transition duration-200" data-size="US 10">US 10</button>
+                        <button class="size-option p-3 rounded-lg border-2 border-gray-300 hover:border-indigo-500 transition duration-200" data-size="US 11">US 11</button>
+                    </div>
+                </div>
+
+                <!-- Color Selector -->
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2">Select Color</h4>
+                    <div class="flex flex-wrap gap-4">
+                        <button class="color-option h-10 w-10 rounded-full border-2 border-transparent transition-transform duration-200" style="background-color: #ef4444;" data-color="red"></button>
+                        <button class="color-option h-10 w-10 rounded-full border-2 border-transparent transition-transform duration-200" style="background-color: #10b981;" data-color="green"></button>
+                        <button class="color-option h-10 w-10 rounded-full border-2 border-transparent transition-transform duration-200" style="background-color: #6366f1;" data-color="indigo"></button>
+                        <button class="color-option h-10 w-10 rounded-full border-2 border-transparent transition-transform duration-200" style="background-color: #000000;" data-color="black"></button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 mt-auto">
+                    <button id="add-to-cart-button" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 text-lg">
+                        <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                    </button>
+                    <button id="add-to-favorites-button" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 text-lg">
+                        <i class="fas fa-heart mr-2 text-red-500"></i> Add to Favorites
+                    </button>
+                    <button id="buy-now-button" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 text-lg">
+                        <i class="fas fa-bolt mr-2"></i> Buy Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products Section -->
+    <div class="container mx-auto px-4 py-12">
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-8 text-center">Related Products</h2>
+        <!-- Carousel Container -->
+        <div class="relative flex items-center">
+            <!-- Previous Button -->
+            <button id="prev-button" class="absolute -left-10 z-10 p-3 bg-white rounded-full shadow-md hover:bg-gray-200 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <i class="fas fa-chevron-left text-gray-700"></i>
+            </button>
+            <!-- Products Grid -->
+            <div id="related-products-carousel" class="flex overflow-x-hidden scroll-smooth w-full space-x-8">
+                <!-- Related Product 1 -->
+                <div class="min-w-max bg-white rounded-lg shadow-xl overflow-hidden p-6 text-center">
+                    <a href="#" class="block">
+                        <img src="https://placehold.co/400x300/FCA5A5/FFFFFF?text=Product+A" alt="Related Product A" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Nike Blazer Mid '77</h3>
+                        <p class="text-lg font-bold text-indigo-600 related-product-price" data-base-price="100.00">$100.00</p>
+                    </a>
+                </div>
+
+                <!-- Related Product 2 -->
+                <div class="min-w-max bg-white rounded-lg shadow-xl overflow-hidden p-6 text-center">
+                    <a href="#" class="block">
+                        <img src="https://placehold.co/400x300/6EE7B7/FFFFFF?text=Product+B" alt="Related Product B" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Adidas Stan Smith</h3>
+                        <p class="text-lg font-bold text-indigo-600 related-product-price" data-base-price="90.00">$90.00</p>
+                    </a>
+                </div>
+
+                <!-- Related Product 3 -->
+                <div class="min-w-max bg-white rounded-lg shadow-xl overflow-hidden p-6 text-center">
+                    <a href="#" class="block">
+                        <img src="https://placehold.co/400x300/FDBA74/FFFFFF?text=Product+C" alt="Related Product C" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Puma Suede Classic</h3>
+                        <p class="text-lg font-bold text-indigo-600 related-product-price" data-base-price="75.00">$75.00</p>
+                    </a>
+                </div>
+
+                <!-- Related Product 4 -->
+                <div class="min-w-max bg-white rounded-lg shadow-xl overflow-hidden p-6 text-center">
+                    <a href="#" class="block">
+                        <img src="https://placehold.co/400x300/C7D2FE/FFFFFF?text=Product+D" alt="Related Product D" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">New Balance 550</h3>
+                        <p class="text-lg font-bold text-indigo-600 related-product-price" data-base-price="120.00">$120.00</p>
+                    </a>
+                </div>
+            </div>
+            <!-- Next Button -->
+            <button id="next-button" class="absolute -right-10 z-10 p-3 bg-white rounded-full shadow-md hover:bg-gray-200 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <i class="fas fa-chevron-right text-gray-700"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12 rounded-t-lg">
+        <div class="container mx-auto px-4 text-center flex flex-col md:flex-row justify-between items-center">
+            <!-- Social Media Links -->
+            <div class="flex space-x-6 mb-4 md:mb-0">
+                <a href="https://instagram.com" target="_blank" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fab fa-instagram text-2xl"></i>
+                </a>
+                <a href="https://twitter.com" target="_blank" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fab fa-twitter text-2xl"></i>
+                </a>
+                <a href="https://facebook.com" target="_blank" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fab fa-facebook-f text-2xl"></i>
+                </a>
+            </div>
+            
+            <!-- Currency Selector -->
+            <div class="flex items-center gap-2 mb-4 md:mb-0">
+                <label for="currency-selector" class="text-gray-400 text-sm font-medium">Select your Region:</label>
+                <select id="currency-selector" class="filter-select bg-gray-700 text-white border-gray-600 hover:border-indigo-500 rounded-lg p-2 text-sm">
+                    <option value="usa">United States (USD)</option>
+                    <option value="india">India (INR)</option>
+                    <option value="uk">United Kingdom (GBP)</option>
+                    <option value="canada">Canada (CAD)</option>
+                    <option value="australia">Australia (AUD)</option>
+                    <option value="germany">Germany (EUR)</option>
+                    <option value="japan">Japan (JPY)</option>
+                </select>
+            </div>
+            
+            <!-- Copyright Text -->
+            <p class="text-gray-400">
+                &copy; 2023 SneakerVerse. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // A mock product object to power the page. In a real app, this would be fetched from a database.
+            const product = {
+                id: 1,
+                title: 'Nike Air Max 270',
+                brand: 'Nike',
+                description: 'Experience the ultimate fusion of comfort and style...',
+                basePrice: 150, // Base price in USD
+                images: [
+                    'https://placehold.co/800x600/FCA5A5/FFFFFF?text=Sneaker+Front+View',
+                    'https://placehold.co/800x600/FCA5A5/FFFFFF?text=Sneaker+Side+View',
+                    'https://placehold.co/800x600/FCA5A5/FFFFFF?text=Sneaker+Back+View',
+                    'https://placehold.co/800x600/FCA5A5/FFFFFF?text=Sneaker+Sole+View'
+                ],
+                colors: [
+                    { name: 'red', hex: '#ef4444' },
+                    { name: 'green', hex: '#10b981' },
+                    { name: 'indigo', hex: '#6366f1' },
+                    { name: 'black', hex: '#000000' }
+                ],
+                sizes: ['US 7', 'US 8', 'US 9', 'US 10', 'US 11'],
+                // Price variations based on size and color (mock data)
+                priceVariations: {
+                    'US 7': { 'red': 150, 'green': 155, 'indigo': 160, 'black': 165 },
+                    'US 8': { 'red': 155, 'green': 160, 'indigo': 165, 'black': 170 },
+                    'US 9': { 'red': 160, 'green': 165, 'indigo': 170, 'black': 175 },
+                    'US 10': { 'red': 165, 'green': 170, 'indigo': 175, 'black': 180 },
+                    'US 11': { 'red': 170, 'green': 175, 'indigo': 180, 'black': 185 },
+                }
+            };
+
+            // Mock data for search functionality
+            const searchProducts = [
+                { name: 'Nike Air Max 270', url: '#' },
+                { name: 'Adidas Stan Smith', url: '#' },
+                { name: 'Puma Suede Classic', url: '#' },
+                { name: 'New Balance 550', url: '#' },
+                { name: 'Nike Blazer Mid \'77', url: '#' },
+                { name: 'Vans Old Skool', url: '#' },
+                { name: 'Converse Chuck Taylor All Star', url: '#' },
+                { name: 'Reebok Classic Leather', url: '#' },
+            ];
+
+            // Currency conversion data
+            const countryCurrencyData = {
+                usa: { rate: 1.00, symbol: '$' },
+                india: { rate: 83.00, symbol: '₹' },
+                uk: { rate: 0.79, symbol: '£' },
+                canada: { rate: 1.36, symbol: 'C$' },
+                australia: { rate: 1.50, symbol: 'A$' },
+                germany: { rate: 0.92, symbol: '€' },
+                japan: { rate: 145.00, symbol: '¥' },
+            };
+
+            const mainImage = document.getElementById('main-product-image');
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            const sizeOptions = document.querySelectorAll('.size-option');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const addToCartBtn = document.getElementById('add-to-cart-button');
+            const addToFavoritesBtn = document.getElementById('add-to-favorites-button');
+            const buyNowBtn = document.getElementById('buy-now-button'); // New button
+            const priceElement = document.getElementById('product-price');
+            const currencySelector = document.getElementById('currency-selector');
+            const notificationContainer = document.getElementById('notification-container');
+            const relatedProductPrices = document.querySelectorAll('.related-product-price');
+            
+            // Get the cart and favorites count elements
+            const cartCountSpan = document.getElementById('cart-count');
+            const favoritesCountSpan = document.getElementById('favorites-count');
+
+            // Initialize state variables
+            let cartCount = 0;
+            let favoritesCount = 0;
+            let isFavorited = false;
+            let isAddedToCart = false;
+            let selectedSize = 'US 7';
+            let selectedColor = 'red';
+
+            // --- Functionality ---
+
+            // Image Gallery Logic
+            thumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', () => {
+                    // Update main image src
+                    mainImage.src = thumbnail.dataset.fullImg;
+                    
+                    // Remove border from all thumbnails
+                    thumbnails.forEach(t => t.classList.remove('border-indigo-600', 'border-2'));
+                    
+                    // Add border to the clicked thumbnail
+                    thumbnail.classList.add('border-indigo-600', 'border-2');
+                });
+            });
+
+            // Initial active thumbnail
+            if (thumbnails.length > 0) {
+                thumbnails[0].classList.add('border-indigo-600');
+            }
+
+            // Function to update the main product price
+            function updateMainProductPrice() {
+                // Get the base price based on selected size and color
+                let basePrice = product.priceVariations[selectedSize][selectedColor];
+                
+                const selectedCountry = currencySelector.value;
+                const currency = countryCurrencyData[selectedCountry];
+                const newPrice = (basePrice * currency.rate).toFixed(2);
+                priceElement.textContent = `${currency.symbol}${newPrice}`;
+            }
+
+            // Function to update the related products prices
+            function updateRelatedProductsPrices() {
+                const selectedCountry = currencySelector.value;
+                const currency = countryCurrencyData[selectedCountry];
+                relatedProductPrices.forEach(priceEl => {
+                    const basePrice = parseFloat(priceEl.dataset.basePrice);
+                    const newPrice = (basePrice * currency.rate).toFixed(2);
+                    priceEl.textContent = `${currency.symbol}${newPrice}`;
+                });
+            }
+
+            // Function to update all prices on the page
+            function updateAllPrices() {
+                updateMainProductPrice();
+                updateRelatedProductsPrices();
+            }
+
+            // Size Selection Logic
+            sizeOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    sizeOptions.forEach(o => o.classList.remove('selected-option'));
+                    option.classList.add('selected-option');
+                    selectedSize = option.dataset.size;
+                    updateMainProductPrice(); // Only update the main product price for size change
+                });
+            });
+            // Initial active size and price
+            if (sizeOptions.length > 0) {
+                sizeOptions[0].classList.add('selected-option');
+                selectedSize = sizeOptions[0].dataset.size;
+            }
+
+            // Color Selection Logic
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    colorOptions.forEach(o => o.classList.remove('selected-option'));
+                    option.classList.add('selected-option');
+                    selectedColor = option.dataset.color;
+                    updateMainProductPrice(); // Only update the main product price for color change
+                });
+            });
+            // Initial active color and price
+            if (colorOptions.length > 0) {
+                colorOptions[0].classList.add('selected-option');
+                selectedColor = colorOptions[0].dataset.color;
+            }
+
+            // Event listener for currency change
+            currencySelector.addEventListener('change', updateAllPrices);
+            updateAllPrices(); // Initial price update on page load
+
+            // Action Buttons Logic
+            addToCartBtn.addEventListener('click', () => {
+                // Check if the item has already been added to the cart
+                if (isAddedToCart) {
+                    showNotification('This item is already in your cart!', 'fa-shopping-cart', 'bg-green-500');
+                    return; // Stop execution
+                }
+
+                // Increment cart count and update the display
+                cartCount++;
+                cartCountSpan.textContent = cartCount;
+                showNotification('Product Added to Cart!', 'fa-shopping-cart', 'bg-green-500');
+
+                // Set the flag to true to prevent further clicks
+                isAddedToCart = true;
+
+                // Optional: Provide visual feedback by disabling the button
+                addToCartBtn.disabled = true;
+                addToCartBtn.classList.remove('hover:bg-indigo-700');
+                addToCartBtn.classList.add('cursor-not-allowed', 'opacity-50');
+            });
+
+            addToFavoritesBtn.addEventListener('click', () => {
+                // Check if the item has already been favorited
+                if (isFavorited) {
+                    showNotification('This item is already in your favorites!', 'fa-heart', 'bg-red-500');
+                    return; // Stop execution
+                }
+
+                // Increment favorites count and update the display
+                favoritesCount++;
+                favoritesCountSpan.textContent = favoritesCount;
+                showNotification('Product Added to Favorites!', 'fa-heart', 'bg-red-500');
+
+                // Set the flag to true to prevent further clicks
+                isFavorited = true;
+
+                // Optional: Provide visual feedback by disabling the button
+                addToFavoritesBtn.disabled = true;
+                addToFavoritesBtn.classList.remove('hover:bg-gray-300');
+                addToFavoritesBtn.classList.add('cursor-not-allowed', 'opacity-50');
+            });
+
+            // New "Buy Now" button logic
+            buyNowBtn.addEventListener('click', () => {
+                showNotification('Redirecting to Checkout...', 'fa-bolt', 'bg-green-600');
+            });
+
+
+            /**
+             * Displays a custom notification at the bottom of the page.
+             * @param {string} message The message to display.
+             * @param {string} iconClass The Font Awesome class for the icon (e.g., 'fa-shopping-cart').
+             * @param {string} colorClass The Tailwind class for the background color (e.g., 'bg-green-500').
+             */
+            function showNotification(message, iconClass, colorClass) {
+                // Clear any existing notifications
+                notificationContainer.innerHTML = '';
+                
+                const notification = document.createElement('div');
+                notification.classList.add('notification', 'text-gray-800');
+                notification.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fas ${iconClass} ${colorClass} text-white rounded-full p-2"></i>
+                        <span class="font-semibold text-lg">${message}</span>
+                    </div>
+                `;
+                
+                notificationContainer.appendChild(notification);
+                
+                // Automatically remove the notification after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            // --- Related Products Carousel Logic ---
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+            const carousel = document.getElementById('related-products-carousel');
+            const productCards = carousel.querySelectorAll('.min-w-max'); // Get the product cards
+
+            // Scroll distance is the width of one card plus the gap (space-x-8 is 2rem or 32px)
+            let scrollDistance = 0;
+            if (productCards.length > 0) {
+                // Calculate the scroll distance based on the first product card's width and the gap
+                scrollDistance = productCards[0].offsetWidth + 32;
+            }
+
+            nextButton.addEventListener('click', () => {
+                carousel.scrollBy({
+                    left: scrollDistance,
+                    behavior: 'smooth'
+                });
+            });
+
+            prevButton.addEventListener('click', () => {
+                carousel.scrollBy({
+                    left: -scrollDistance,
+                    behavior: 'smooth'
+                });
+            });
+
+            // --- Search Bar Logic ---
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+            const clearSearchButton = document.getElementById('clear-search-button');
+            const searchResultsDropdown = document.getElementById('search-results-dropdown');
+
+            /**
+             * Performs the search and updates the dropdown.
+             */
+            function performSearch() {
+                const query = searchInput.value.toLowerCase().trim();
+                searchResultsDropdown.innerHTML = '';
+
+                if (query.length === 0) {
+                    searchResultsDropdown.style.display = 'none';
+                    clearSearchButton.style.display = 'none';
+                    return;
+                }
+
+                // Show the clear button
+                clearSearchButton.style.display = 'flex';
+
+                const filteredProducts = searchProducts.filter(product => 
+                    product.name.toLowerCase().includes(query)
+                );
+
+                if (filteredProducts.length > 0) {
+                    filteredProducts.forEach(product => {
+                        const resultItem = document.createElement('a');
+                        resultItem.href = product.url;
+                        resultItem.classList.add('block', 'search-result-item');
+                        resultItem.textContent = product.name;
+                        searchResultsDropdown.appendChild(resultItem);
+                    });
+                    searchResultsDropdown.style.display = 'block';
+                } else {
+                    searchResultsDropdown.style.display = 'none';
+                }
+            }
+
+            // Event listener for typing in the search bar
+            searchInput.addEventListener('input', performSearch);
+            
+            // Event listener for the new search button
+            searchButton.addEventListener('click', performSearch);
+
+            // Event listener for the clear button
+            clearSearchButton.addEventListener('click', () => {
+                searchInput.value = '';
+                performSearch(); // This will clear the dropdown and hide the clear button
+            });
+
+
+            // Hide the dropdown when clicking outside the search bar
+            document.addEventListener('click', (event) => {
+                if (!searchInput.contains(event.target) && !searchResultsDropdown.contains(event.target) && !clearSearchButton.contains(event.target) && !searchButton.contains(event.target)) {
+                    searchResultsDropdown.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

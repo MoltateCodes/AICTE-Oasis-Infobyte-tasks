@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SneakerVerse | Product Listing</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons (Cart, Heart, Social Media) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; 
+        }
+        .filter-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3e%3cpath d='M7 7l3 3 3-3m0 6l-3-3-3 3' stroke='%234B5563' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        /* Custom styles for the notification */
+        .notification-container {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+        .notification {
+            background-color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 9999px; /* Full rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            animation: fadeInOut 3s forwards;
+            opacity: 0;
+            text-align: center;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+        /* Search results dropdown styling */
+        #search-results-dropdown {
+            max-height: 300px;
+            overflow-y: auto;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background-color: #fff;
+            border-radius: 0 0 0.5rem 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            display: none;
+        }
+        .search-result-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.2s ease;
+        }
+        .search-result-item:hover {
+            background-color: #f1f5f9;
+        }
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Styles for the Advertisement Carousel */
+        #advertisement-carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin: 1.5rem auto;
+            max-width: 1200px;
+            height: 400px;
+        }
+
+        #ad-slides-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .ad-slide {
+            flex-shrink: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            position: relative;
+        }
+
+        .ad-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .ad-content {
+            z-index: 10;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+        }
+
+        .ad-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 1rem;
+            cursor: pointer;
+            z-index: 20;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+        }
+
+        .ad-button:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        #ad-prev-button {
+            left: 1rem;
+        }
+
+        #ad-next-button {
+            right: 1rem;
+        }
+
+        #ad-dots-container {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 20;
+        }
+
+        .ad-dot {
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .ad-dot.active {
+            background-color: white;
+            width: 12px;
+            height: 12px;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md p-4 sticky top-0 z-50 rounded-b-lg">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <!-- Logo/Brand Name -->
+            <a href="index.html" class="text-3xl font-bold text-indigo-700 mb-4 md:mb-0">SneakerVerse</a>
+
+            <!-- Navigation Links and Search Bar -->
+            <div class="flex flex-col md:flex-row items-center flex-grow gap-6 mb-4 md:mb-0 md:mx-10">
+                <a href="index.html" class="text-gray-700 hover:text-indigo-600 transition duration-300">Home</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">Shop All</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">New Arrivals</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition duration-300">Sale</a>
+                
+                <!-- Search Bar with circular input and buttons -->
+                <div class="relative w-full md:w-80 flex items-center">
+                    <input type="text" id="search-input" placeholder="Search for sneakers..." class="w-full px-4 py-2 pl-10 pr-20 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <!-- Clear button (initially hidden) -->
+                    <button id="clear-search-button" class="absolute inset-y-0 right-10 flex items-center p-2.5 rounded-full text-gray-400 hover:text-gray-600 focus:outline-none" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <!-- Search button is now a circular symbol without background -->
+                    <button id="search-button" class="absolute inset-y-0 right-1 flex items-center p-2.5 rounded-full text-indigo-600 hover:text-indigo-700 focus:outline-none">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <!-- Search Results Dropdown -->
+                    <div id="search-results-dropdown"></div>
+                </div>
+            </div>
+            
+            <!-- Cart and Favorites Icons -->
+            <div class="flex items-center gap-4">
+                <a href="#" class="text-gray-700 hover:text-red-500 transition duration-300 relative">
+                    <i class="fas fa-heart text-2xl"></i>
+                    <span id="favorites-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-green-500 transition duration-300 relative">
+                    <i class="fas fa-shopping-cart text-2xl"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Advertisement Carousel -->
+    <section id="advertisement-carousel" class="container mx-auto px-4">
+        <div id="ad-slides-container">
+            <!-- Ad slides will be injected here by JavaScript -->
+        </div>
+        <button id="ad-prev-button" class="ad-button">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="ad-next-button" class="ad-button">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div id="ad-dots-container">
+            <!-- Ad dots will be injected here -->
+        </div>
+    </section>
+
+    <!-- Main Content Section -->
+    <main class="container mx-auto px-4 py-12">
+        <!-- Filters and Sorting Section -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+            <h2 class="text-2xl font-bold text-gray-800">Featured Products</h2>
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <label for="brand-filter" class="text-gray-700 font-medium">Brand:</label>
+                    <select id="brand-filter" class="filter-select border border-gray-300 rounded-lg p-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">All</option>
+                        <option value="nike">Nike</option>
+                        <option value="adidas">Adidas</option>
+                        <option value="puma">Puma</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="sort-by" class="text-gray-700 font-medium">Sort by:</label>
+                    <select id="sort-by" class="filter-select border border-gray-300 rounded-lg p-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="default">Default</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                    </select>
+                </div>
+                <!-- Clear Filters button -->
+                <button id="clear-filters-button" class="hidden bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300">
+                    Clear Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+            <!-- Product Card 1 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="nike" data-price="160.49" data-id="1">
+                <a href="product-detail.html" class="block p-4">
+                    <img src="Nike_Men_Air_Max.png" alt="Nike Air Max 270" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Nike Air Max 270</h3>
+                    <p class="text-gray-500 mb-2">Comfort and style combined</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$160.49</span>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 2 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="adidas" data-price="55.03" data-id="2">
+                <a href="#" class="block p-4">
+                    <img src="Converse.png" alt="Converse Unisex Chuck Taylor All Star High Top Sneakers" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Converse Unisex Chuck Taylor All Star High Top Sneakers</h3>
+                    <p class="text-gray-500 mb-2">OrthoLite insole for comfort.</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$55.03</span>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Product Card 3 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="puma" data-price="42.42" data-id="3">
+                <a href="#" class="block p-4">
+                    <img src="PumaUnisex-AdultRS-XReinventionBlack-HighRiskRedSneaker-3UK_1_1920x.jpg" alt="Puma Unisex-Adult RS-X Reinvention Black-High Risk Red Sneaker UK-3 (36957913)" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Puma Unisex-Adult RS-X Reinvention Black-High Risk Red Sneaker UK-3 (36957913)</h3>
+                    <p class="text-gray-500 mb-2">A timeless street icon</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$42.42 </span><strike>$114.66</strike>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Product Card 4 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="Vans Old Skool Shoe" data-price="108.93" data-id="4">
+                <a href="#" class="block p-4">
+                    <img src="Artboard4.jpeg.webp" alt="Vans Old Skool Shoe Black / White" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Vans Old Skool Shoe Black / White</h3>
+                    <p class="text-gray-500 mb-2">Vintage style, modern comfort</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$108.93</span>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 5 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="adidas" data-price="135" data-id="5">
+                <a href="#" class="block p-4">
+                    <img src="Rebook.png" alt="REEBOK CLASSIC Club C 85 Lace-Up Sneakers" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">REEBOK CLASSIC Club C 85 Lace-Up Sneakers</h3>
+                    <p class="text-gray-500 mb-2">Iconic shell-toe design</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$48.15</span><strike>$80.26</strike>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 6 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="puma" data-price="110" data-id="6">
+                <a href="#" class="block p-4">
+                    <img src="ASICS Men's, Gel-Kayano 28 Running Shoe - Wide Width.png" alt="ASICS Men's, Gel-Kayano 28 Running Shoe - Wide Width.png" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">ASICS Men's, Gel-Kayano 28 Running Shoe - Wide Width</h3>
+                    <p class="text-gray-500 mb-2">Reimagined retro running style</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$50.59</span>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Product Card 7 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="nike" data-price="140" data-id="7">
+                <a href="#" class="block p-4">
+                    <img src="Puma Women Adela Sneaker Black UK-3.jpg" alt="Puma Women Adela Sneaker Black UK-3" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Puma Women Adela Sneaker Black UK-3</h3>
+                    <p class="text-gray-500 mb-2">SoftFoam+ sockliner provides superior cushioning and optimal comfort for every step of your day</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$20.00</span><strike>$51.46</strike>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 8 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="puma" data-price="85" data-id="8">
+                <a href="#" class="block p-4">
+                    <img src="Theater.png" alt="Theater" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Theater Women Wicked Brothers Lace-Up Sneakers</h3>
+                    <p class="text-gray-500 mb-2">Unique, stylish material adds depth and a retro vibe to your look</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$30.78</span><strike>$34.20</strike>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 9 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="puma" data-price="20.02" data-id="9">
+                <a href="#" class="block p-4">
+                    <img src="Chuck Taylor All Star Eyes Easy On Kids.png" alt="Chuck Taylor All Star Eyes Easy On Kids" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Chuck Taylor All Star Eyes Easy On Kids</h3>
+                    <p class="text-gray-500 mb-2">Give'Em Something To Giggle About With These Googly-Eyed Chucks.</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$20.02</span><strike>$40.02</strike>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 10 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="puma" data-price="37" data-id="10">
+                <a href="#" class="block p-4">
+                    <img src="Softride Premier Youth Slip-On Running Shoes PUMA.png" alt="Softride Premier Youth Slip-On Running Shoes PUMA" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Softride Premier Youth Slip-On Running Shoes PUMA</h3>
+                    <p class="text-gray-500 mb-2">PUMA's SOFTRIDE technology represents an advancement in footwear comfort</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$37.00</span><strike>$56.93</strike>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 11 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="puma" data-price="85" data-id="11">
+                <a href="#" class="block p-4">
+                    <img src="Nike Court Borough Low Recraft.png" alt="Nike Court Borough Low Recraft" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Nike Court Borough Low Recraft</h3>
+                    <p class="text-gray-500 mb-2">Run (don't walk) to your new favourite Borough.</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$51.19</span>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 12 -->
+            <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col justify-between" data-brand="puma" data-price="85" data-id="12">
+                <a href="#" class="block p-4">
+                    <img src="Barricade Tennis Shoes Kids.png" alt="Barricade Tennis Shoes Kids" class="w-full h-48 object-cover rounded-lg mb-4 hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Barricade Tennis Shoes Kids</h3>
+                    <p class="text-gray-500 mb-2">West coast cool</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-2xl font-extrabold text-indigo-600">$47.82</span>
+                    </div>
+                </a>
+                <div class="p-4 flex gap-2">
+                    <button class="add-to-cart-button w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="add-to-favorites-button bg-gray-200 text-red-500 py-3 px-4 rounded-full hover:bg-gray-300 transition duration-300">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12 rounded-t-lg">
+        <div class="container mx-auto px-4 text-center flex flex-col md:flex-row justify-between items-center">
+            <!-- Social Media Links -->
+            <div class="flex space-x-6 mb-4 md:mb-0">
+                <a href="https://instagram.com" target="_blank" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fab fa-instagram text-2xl"></i>
+                </a>
+                <a href="https://twitter.com" target="_blank" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fab fa-twitter text-2xl"></i>
+                </a>
+                <a href="https://facebook.com" target="_blank" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fab fa-facebook-f text-2xl"></i>
+                </a>
+            </div>
+            
+            <!-- Currency Selector -->
+            <div class="flex items-center gap-2 mb-4 md:mb-0">
+                <label for="currency-selector" class="text-gray-400 text-sm font-medium">Select your Region:</label>
+                <select id="currency-selector" class="filter-select bg-gray-700 text-white border-gray-600 hover:border-indigo-500 rounded-lg p-2 text-sm">
+                    <option value="usa">United States (USD)</option>
+                    <option value="india">India (INR)</option>
+                    <option value="uk">United Kingdom (GBP)</option>
+                    <option value="canada">Canada (CAD)</option>
+                    <option value="australia">Australia (AUD)</option>
+                    <option value="germany">Germany (EUR)</option>
+                    <option value="japan">Japan (JPY)</option>
+                </select>
+            </div>
+            
+            <!-- Copyright Text -->
+            <p class="text-gray-400">
+                &copy; 2023 SneakerVerse. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mock data for search functionality
+            const searchProducts = [
+                { name: 'Nike Air Max 270', url: '#' },
+                { name: 'Converse Unisex Chuck Taylor All Star High Top Sneakers', url: '#' },
+                { name: 'Puma Unisex-Adult RS-X Reinvention Black-High Risk Red Sneaker UK-3 (36957913)', url: '#' },
+                { name: 'Vans Old Skool Shoe Black / White', url: '#' },
+                { name: 'REEBOK CLASSIC Club C 85 Lace-Up Sneakers', url: '#' },
+                { name: 'ASICS Men\'s, Gel-Kayano 28 Running Shoe - Wide Width', url: '#' },
+                { name: 'Puma Women Adela Sneaker Black UK-3', url: '#' },
+                { name: 'Theater Women Wicked Brothers Lace-Up Sneakers', url: '#' },
+                { name: 'Chuck Taylor All Star Eyes Easy On Kids', url: '#' },
+                { name: 'Softride Premier Youth Slip-On Running Shoes PUMA', url: '#' },
+                { name: 'Nike Court Borough Low Recraft', url: '#' },
+                { name: 'Barricade Tennis Shoes Kids', url: '#' }
+            ];
+
+            const countryCurrencyData = {
+                usa: { rate: 1.00, symbol: '$' },
+                india: { rate: 83.00, symbol: '₹' },
+                uk: { rate: 0.79, symbol: '£' },
+                canada: { rate: 1.36, symbol: 'C$' },
+                australia: { rate: 1.50, symbol: 'A$' },
+                germany: { rate: 0.92, symbol: '€' },
+                japan: { rate: 145.00, symbol: '¥' },
+            };
+
+            const productGrid = document.getElementById('product-grid');
+            const sortBy = document.getElementById('sort-by');
+            const brandFilter = document.getElementById('brand-filter');
+            const currencySelector = document.getElementById('currency-selector');
+            const allProducts = Array.from(document.querySelectorAll('.product-card'));
+            const notificationContainer = document.getElementById('notification-container');
+            const clearFiltersButton = document.getElementById('clear-filters-button');
+            
+            // Get the cart and favorites count elements
+            const cartCountSpan = document.getElementById('cart-count');
+            const favoritesCountSpan = document.getElementById('favorites-count');
+
+            // Initialize state variables
+            let cartCount = 0;
+            let favoritesCount = 0;
+            let favoritedProducts = {}; // Object to track favorited products by ID
+            let addedToCartProducts = {}; // Object to track products added to cart by ID
+
+            // --- Functionality ---
+
+            /**
+             * Filters and sorts the product grid.
+             */
+            function updateProductGrid() {
+                const brand = brandFilter.value;
+                const sort = sortBy.value;
+
+                // 1. Filter products
+                const filteredProducts = allProducts.filter(product => {
+                    const productBrand = product.dataset.brand;
+                    return brand === 'all' || productBrand === brand;
+                });
+
+                // 2. Sort products
+                filteredProducts.sort((a, b) => {
+                    const priceA = parseFloat(a.dataset.price);
+                    const priceB = parseFloat(b.dataset.price);
+
+                    if (sort === 'price-asc') {
+                        return priceA - priceB;
+                    } else if (sort === 'price-desc') {
+                        return priceB - priceA;
+                    } else {
+                        return 0; // No sorting for 'default'
+                    }
+                });
+
+                // 3. Update the DOM
+                productGrid.innerHTML = '';
+                filteredProducts.forEach(product => productGrid.appendChild(product));
+
+                // Update the state of the clear filters button
+                updateClearFiltersButton();
+            }
+
+            /**
+             * Shows or hides the 'Clear Filters' button based on active filters.
+             */
+            function updateClearFiltersButton() {
+                const isBrandFiltered = brandFilter.value !== 'all';
+                const isSorted = sortBy.value !== 'default';
+                
+                if (isBrandFiltered || isSorted) {
+                    clearFiltersButton.classList.remove('hidden');
+                } else {
+                    clearFiltersButton.classList.add('hidden');
+                }
+            }
+
+            // Event listeners for filters and sorting
+            brandFilter.addEventListener('change', updateProductGrid);
+            sortBy.addEventListener('change', updateProductGrid);
+
+            // Event listener for the clear filters button
+            clearFiltersButton.addEventListener('click', () => {
+                brandFilter.value = 'all';
+                sortBy.value = 'default';
+                updateProductGrid();
+            });
+
+            // Initial grid update on page load
+            updateProductGrid();
+
+            // Currency conversion logic
+            function updateAllPrices() {
+                const selectedCountry = currencySelector.value;
+                const currency = countryCurrencyData[selectedCountry];
+
+                allProducts.forEach(product => {
+                    const priceElement = product.querySelector('.text-2xl');
+                    const basePrice = parseFloat(product.dataset.price);
+                    const newPrice = (basePrice * currency.rate).toFixed(2);
+                    priceElement.textContent = `${currency.symbol}${newPrice}`;
+                });
+            }
+
+            currencySelector.addEventListener('change', updateAllPrices);
+            updateAllPrices(); // Initial price update on page load
+
+            // Action Buttons Logic
+            productGrid.addEventListener('click', (event) => {
+                const target = event.target.closest('button');
+
+                if (target && target.classList.contains('add-to-cart-button')) {
+                    // Correctly get the product ID from the parent card
+                    const productCard = target.closest('.product-card');
+                    const productId = productCard.dataset.id;
+                    
+                    if (addedToCartProducts[productId]) {
+                        showNotification('This item is already in your cart!', 'fa-shopping-cart', 'bg-green-500');
+                    } else {
+                        addedToCartProducts[productId] = true;
+                        cartCount++;
+                        cartCountSpan.textContent = cartCount;
+                        showNotification('Product Added to Cart!', 'fa-shopping-cart', 'bg-green-500');
+                    }
+                } else if (target && target.classList.contains('add-to-favorites-button')) {
+                    const productCard = target.closest('.product-card');
+                    const productId = productCard.dataset.id;
+                    if (favoritedProducts[productId]) {
+                        showNotification('This item is already in your favorites!', 'fa-heart', 'bg-red-500');
+                    } else {
+                        favoritedProducts[productId] = true;
+                        favoritesCount++;
+                        favoritesCountSpan.textContent = favoritesCount;
+                        showNotification('Product Added to Favorites!', 'fa-heart', 'bg-red-500');
+                    }
+                }
+            });
+
+            /**
+             * Displays a custom notification at the bottom of the page.
+             * @param {string} message The message to display.
+             * @param {string} iconClass The Font Awesome class for the icon (e.g., 'fa-shopping-cart').
+             * @param {string} colorClass The Tailwind class for the background color (e.g., 'bg-green-500').
+             */
+            function showNotification(message, iconClass, colorClass) {
+                // Clear any existing notifications
+                notificationContainer.innerHTML = '';
+                
+                const notification = document.createElement('div');
+                notification.classList.add('notification', 'text-gray-800');
+                notification.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fas ${iconClass} ${colorClass} text-white rounded-full p-2"></i>
+                        <span class="font-semibold text-lg">${message}</span>
+                    </div>
+                `;
+                
+                notificationContainer.appendChild(notification);
+                
+                // Automatically remove the notification after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            // --- Search Bar Logic ---
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+            const clearSearchButton = document.getElementById('clear-search-button');
+            const searchResultsDropdown = document.getElementById('search-results-dropdown');
+
+            /**
+             * Performs the search and updates the dropdown.
+             */
+            function performSearch() {
+                const query = searchInput.value.toLowerCase().trim();
+                searchResultsDropdown.innerHTML = '';
+
+                if (query.length === 0) {
+                    searchResultsDropdown.style.display = 'none';
+                    clearSearchButton.style.display = 'none';
+                    return;
+                }
+
+                // Show the clear button
+                clearSearchButton.style.display = 'flex';
+
+                const filteredProducts = searchProducts.filter(product => 
+                    product.name.toLowerCase().includes(query)
+                );
+
+                if (filteredProducts.length > 0) {
+                    filteredProducts.forEach(product => {
+                        const resultItem = document.createElement('a');
+                        resultItem.href = product.url;
+                        resultItem.classList.add('block', 'search-result-item');
+                        resultItem.textContent = product.name;
+                        searchResultsDropdown.appendChild(resultItem);
+                    });
+                    searchResultsDropdown.style.display = 'block';
+                } else {
+                    searchResultsDropdown.style.display = 'none';
+                }
+            }
+
+            // Event listener for typing in the search bar
+            searchInput.addEventListener('input', performSearch);
+            
+            // Event listener for the new search button
+            searchButton.addEventListener('click', performSearch);
+
+            // Event listener for the clear button
+            clearSearchButton.addEventListener('click', () => {
+                searchInput.value = '';
+                performSearch(); // This will clear the dropdown and hide the clear button
+            });
+
+
+            // Hide the dropdown when clicking outside the search bar
+            document.addEventListener('click', (event) => {
+                if (!searchInput.contains(event.target) && !searchResultsDropdown.contains(event.target) && !clearSearchButton.contains(event.target) && !searchButton.contains(event.target)) {
+                    searchResultsDropdown.style.display = 'none';
+                }
+            });
+
+            // --- Ad Carousel Functionality ---
+            const advertisements = [
+                {
+                    image: 'Ad03.png',
+                    text: 'Get 15% Off Your First Purchase',
+                    link: '#sale'
+                },
+                {
+                    image: 'Add2.png',
+                    text: 'New Arrivals Every Week',
+                    link: '#new-arrivals'
+                },
+                {
+                    image: 'Ad04.png',
+                    text: 'Free Shipping On All Orders',
+                    link: '#'
+                }
+            ];
+
+            const adSlidesContainer = document.getElementById('ad-slides-container');
+            const adDotsContainer = document.getElementById('ad-dots-container');
+            const adPrevButton = document.getElementById('ad-prev-button');
+            const adNextButton = document.getElementById('ad-next-button');
+            
+            let currentAdIndex = 0;
+            let adInterval;
+
+            /**
+             * Renders all ad slides into the container.
+             */
+            function renderAdvertisements() {
+                adSlidesContainer.innerHTML = '';
+                advertisements.forEach(ad => {
+                    const adSlide = document.createElement('a');
+                    adSlide.href = ad.link;
+                    adSlide.classList.add('ad-slide');
+                    adSlide.innerHTML = `
+                        <img src="${ad.image}" alt="${ad.text}">
+                        <div class="ad-content">
+                            <h2 class="text-4xl font-bold">${ad.text}</h2>
+                        </div>
+                    `;
+                    adSlidesContainer.appendChild(adSlide);
+                });
+            }
+
+            /**
+             * Creates pagination dots for the ad carousel.
+             */
+            function createAdDots() {
+                adDotsContainer.innerHTML = '';
+                advertisements.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.classList.add('ad-dot');
+                    dot.addEventListener('click', () => {
+                        goToSlide(index);
+                    });
+                    adDotsContainer.appendChild(dot);
+                });
+                updateAdDots();
+            }
+
+            /**
+             * Updates the active state of the ad pagination dots.
+             */
+            function updateAdDots() {
+                const dots = document.querySelectorAll('.ad-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentAdIndex);
+                });
+            }
+
+            /**
+             * Rotates the ad carousel to the next slide.
+             */
+            function rotateAd() {
+                currentAdIndex = (currentAdIndex + 1) % advertisements.length;
+                updateAdCarousel();
+            }
+
+            /**
+             * Stops the automatic ad rotation.
+             */
+            function stopAdRotation() {
+                clearInterval(adInterval);
+            }
+
+            /**
+             * Starts the automatic ad rotation.
+             */
+            function startAdRotation() {
+                adInterval = setInterval(rotateAd, 5000);
+            }
+
+            /**
+             * Navigates the ad carousel to a specific slide.
+             * @param {number} index The index of the slide to go to.
+             */
+            function goToSlide(index) {
+                currentAdIndex = index;
+                updateAdCarousel();
+                stopAdRotation();
+                startAdRotation();
+            }
+
+            /**
+             * Updates the carousel display based on the current index.
+             */
+            function updateAdCarousel() {
+                const offset = -currentAdIndex * 100;
+                adSlidesContainer.style.transform = `translateX(${offset}%)`;
+                updateAdDots();
+            }
+
+            // Event listeners for carousel navigation
+            adPrevButton.addEventListener('click', () => {
+                currentAdIndex = (currentAdIndex - 1 + advertisements.length) % advertisements.length;
+                updateAdCarousel();
+                stopAdRotation();
+                startAdRotation();
+            });
+
+            adNextButton.addEventListener('click', () => {
+                currentAdIndex = (currentAdIndex + 1) % advertisements.length;
+                updateAdCarousel();
+                stopAdRotation();
+                startAdRotation();
+            });
+            
+            // Initial setup for the ads
+            renderAdvertisements();
+            createAdDots();
+            startAdRotation();
+        });
+    </script>
+</body>
+</html>
