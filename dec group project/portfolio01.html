@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevFolio - Web Developer Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --light: #ecf0f1;
+            --dark: #212529;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--dark);
+        }
+        .navbar {
+            padding: 20px 0;
+            transition: all 0.3s;
+        }
+        .navbar.scrolled {
+            background-color: var(--secondary) !important;
+            padding: 10px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: url('https://placehold.co/1920x1080');
+            background-size: cover;
+            background-position: center;
+        }
+        .skill-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .skill-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .skill-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        .project-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .project-img {
+            height: 200px;
+            object-fit: cover;
+        }
+        .testimonial-card {
+            border-left: 4px solid var(--primary);
+        }
+        .faq-item {
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .faq-btn {
+            width: 100%;
+            text-align: left;
+            padding: 15px 20px;
+            background-color: white;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .faq-btn:hover {
+            background-color: var(--light);
+        }
+        .faq-btn:focus {
+            box-shadow: none;
+        }
+        .faq-btn.collapsed .fa-chevron-down {
+            transform: rotate(0deg);
+        }
+        .faq-btn .fa-chevron-down {
+            float: right;
+            transform: rotate(180deg);
+            transition: all 0.3s;
+        }
+        .faq-body {
+            padding: 15px 20px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+        .contact-info {
+            background-color: var(--light);
+            padding: 40px;
+            border-radius: 10px;
+        }
+        footer {
+            background-color: var(--secondary);
+            color: white;
+            padding: 40px 0 20px;
+        }
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+        .social-icons a:hover {
+            color: var(--primary);
+            transform: translateY(-5px);
+        }
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 40px;
+        }
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: transparent;">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">DevFolio</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#skills">Skills</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#projects">Projects</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#testimonials">Testimonials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#faq">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero-section">
+        <div class="hero-bg"></div>
+        <div class="container hero-content">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Hi, I'm <span class="text-warning">Alex Developer</span></h1>
+                    <h2 class="mb-4">Full Stack Web Developer</h2>
+                    <p class="lead mb-4">I build beautiful, responsive, and high-performance websites and web applications.</p>
+                    <a href="#contact" class="btn btn-light btn-lg me-3">Hire Me</a>
+                    <a href="#projects" class="btn btn-outline-light btn-lg">View Work</a>
+                </div>
+                <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                    <img src="Profile01.png" alt="Professional portrait of web developer - smiling developer with glasses working at computer workstation" class="img-fluid rounded-circle" style="max-width: 300px; border: 5px solid white;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-5">
+        <div class="container">
+            <h2 class="text-center section-title">My Skills</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card skill-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <div class="skill-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <h3 class="card-title">Frontend Development</h3>
+                            <p class="card-text">HTML5, CSS3, JavaScript, React, Vue.js, Bootstrap, Tailwind CSS</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card skill-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <div class="skill-icon">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <h3 class="card-title">Backend Development</h3>
+                            <p class="card-text">Node.js, Express, PHP, Laravel, Python, Django, MySQL, MongoDB</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card skill-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <div class="skill-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <h3 class="card-title">Other Skills</h3>
+                            <p class="card-text">Responsive Design, UI/UX, Git, Docker, AWS, SEO Optimization</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center section-title">Featured Projects</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card project-card h-100">
+                        <img src="e-commerse.png" class="card-img-top project-img" alt="E-commerce website dashboard showing product listings and analytics">
+                        <div class="card-body">
+                            <h3 class="card-title">E-Shop Platform</h3>
+                            <p class="card-text">A full-featured e-commerce platform built with React and Node.js with payment gateway integration.</p>
+                            <div class="badges mb-3">
+                                <span class="badge bg-primary">React</span>
+                                <span class="badge bg-secondary">Node.js</span>
+                                <span class="badge bg-success">MongoDB</span>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-outline-primary">View Project</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card project-card h-100">
+                        <img src="Task.png" class="card-img-top project-img" alt="Task management application interface with Kanban board and calendar view">
+                        <div class="card-body">
+                            <h3 class="card-title">Task Manager App</h3>
+                            <p class="card-text">Productivity app with task management, calendar, and team collaboration features.</p>
+                            <div class="badges mb-3">
+                                <span class="badge bg-primary">Vue.js</span>
+                                <span class="badge bg-secondary">Firebase</span>
+                                <span class="badge bg-success">PWA</span>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-outline-primary">View Project</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card project-card h-100">
+                        <img src="Health.png" class="card-img-top project-img" alt="Healthcare mobile application interface showing appointment booking and doctor profiles">
+                        <div class="card-body">
+                            <h3 class="card-title">HealthCare App</h3>
+                            <p class="card-text">Telemedicine platform connecting patients with healthcare providers.</p>
+                            <div class="badges mb-3">
+                                <span class="badge bg-primary">React Native</span>
+                                <span class="badge bg-secondary">Django</span>
+                                <span class="badge bg-success">PostgreSQL</span>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-outline-primary">View Project</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a href="#" class="btn btn-primary">View All Projects</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="py-5">
+        <div class="container">
+            <h2 class="text-center section-title">Client Testimonials</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 p-3 testiomonial-card">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <i class="fas fa-quote-left text-primary"></i>
+                            </div>
+                            <p class="card-text">"Alex delivered our e-commerce platform ahead of schedule with exceptional quality. His attention to detail and problem-solving skills are outstanding."</p>
+                            <div class="d-flex align-items-center mt-4">
+                                <img src="https://placehold.co/50x50" alt="Portrait of Sarah Wilson - CEO of RetailCo, professional woman in business attire" class="rounded-circle me-3">
+                                <div>
+                                    <h5 class="mb-0">Sarah Wilson</h5>
+                                    <small class="text-muted">CEO, RetailCo</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 p-3 testiomonial-card">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <i class="fas fa-quote-left text-primary"></i>
+                            </div>
+                            <p class="card-text">"Working with Alex was a pleasure. He transformed our outdated website into a modern, responsive platform that increased our conversion rate by 40%."</p>
+                            <div class="d-flex align-items-center mt-4">
+                                <img src="https://placehold.co/50x50" alt="Portrait of Michael Rodriguez - Marketing Director at TechSolutions" class="rounded-circle me-3">
+                                <div>
+                                    <h5 class="mb-0">Michael Rodriguez</h5>
+                                    <small class="text-muted">Marketing Director, TechSolutions</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 p-3 testiomonial-card">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <i class="fas fa-quote-left text-primary"></i>
+                            </div>
+                            <p class="card-text">"The mobile app Alex developed for our startup exceeded our expectations. His technical expertise and creative solutions were invaluable."</p>
+                            <div class="d-flex align-items-center mt-4">
+                                <img src="https://placehold.co/50x50" alt="Portrait of David Kim - Founder of HealthTech startup" class="rounded-circle me-3">
+                                <div>
+                                    <h5 class="mb-0">David Kim</h5>
+                                    <small class="text-muted">Founder, HealthTech</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center section-title">Frequently Asked Questions</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="faq-item">
+                            <button class="faq-btn" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                What services do you offer as a web developer?
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div id="faq1" class="collapse show faq-body" data-bs-parent="#faqAccordion">
+                                I offer full-stack web development services including frontend development (HTML, CSS, JavaScript, React, Vue), backend development (Node.js, PHP, Python), responsive design, CMS implementation (WordPress, Shopify), API integration, and website maintenance.
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                How long does a typical web development project take?
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div id="faq2" class="collapse faq-body" data-bs-parent="#faqAccordion">
+                                Project timelines vary depending on complexity. A basic website typically takes 2-4 weeks, while more complex web applications can take 3-6 months. I'll provide a detailed timeline after discussing your specific requirements.
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                What is your pricing structure?
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div id="faq3" className="collapse faq-body" data-bs-parent="#faqAccordion">
+                                I offer both fixed-price projects for well-defined scopes and hourly rates for more flexible projects. My pricing is competitive and based on the project complexity. I'm happy to provide a free estimate after discussing your needs.
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                Do you provide ongoing maintenance and support?
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div id="faq4" className="collapse faq-body" data-bs-parent="#faqAccordion">
+                                Yes, I offer several maintenance packages ranging from basic security updates to comprehensive website management. All projects include 30 days of free support post-launch, after which we can discuss a maintenance plan that fits your needs.
+                            </div>
+                        </div>
+                        <div class="
